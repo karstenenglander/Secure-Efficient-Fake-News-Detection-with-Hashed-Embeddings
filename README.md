@@ -1,78 +1,85 @@
-# Secure & Efficient Fake News Detection with Hashed Embeddings 🛡️📰
+# Fake News Detection on ISOT using Hashed Word Embeddings 🛡️📰
 
 ## Overview
 
-This repository contains the code and findings from a research project focused on developing a robust and privacy-conscious fake news detection model. The primary model, utilizing a RandomForest classifier with OpenAI text embeddings and SHA-256 hashed word features, achieved an accuracy of **99.89%** on benchmark datasets (e.g., Lifferth/ISOT - specify which one gave this result). This project was part of a Cybersecurity REU at Montclair State University and was presented at the MIT URTC IEEE Conference (2024).
+This repository showcases a comparative study of fake news detection models applied to the ISOT dataset. The core methodology involves using a RandomForest classifier with various text vectorization techniques where **individual words are first hashed using SHA-256 for privacy exploration before being vectorized/embedded.** This project demonstrates the training and evaluation pipelines for three primary approaches:
 
-The framework explores various text preprocessing pipelines, vectorization techniques (OpenAI embeddings, Doc2Vec, HashingVectorizer), and model optimization strategies, with a key emphasis on computational efficiency and data anonymization for potential deployment in Online Social Networks (OSNs).
+1.  **Doc2Vec** with hashed words.
+2.  **OpenAI Embeddings** (e.g., `text-embedding-ada-002`) on hashed words, incorporating advanced NLP features like Tweetokenizer and Named Entity Recognition (NER) preservation.
+3.  **HashingVectorizer** applied to hashed words.
 
-## The Challenge: Combating Misinformation Securely
+The aim was to develop accurate detection models while investigating a method for data anonymization suitable for environments like Online Social Networks (OSNs). One of these approaches (specify which one, likely HashingVectorizer based on previous info) achieved **99.89% accuracy**. This work was part of a Cybersecurity REU at Montclair State University and contributed to research presented at the MIT URTC IEEE Conference (2024).
 
-The proliferation of fake news on social media poses a significant threat. While many detection models exist, deploying them directly within OSNs raises privacy concerns due to the sensitive nature of user-generated content. This project aimed to:
-1.  Achieve state-of-the-art accuracy in fake news detection.
-2.  Incorporate a layer of data anonymization through cryptographic hashing without significantly compromising model performance.
-3.  Explore and compare different text embedding and vectorization techniques for this task.
-4.  Optimize model parameters for peak performance.
+## Datasets Used
 
-## Key Features & Methodologies
+This project utilizes the **ISOT Fake News Dataset**.
+*   Comprises `Fake.csv` and `True.csv`.
+*   Due to their size, these dataset files are not included directly in this repository.
+*   **You can download the ISOT dataset from:** [Provide Link to Kaggle or original source, e.g., https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset]
+*   Place the downloaded `Fake.csv` and `True.csv` into a `data/` subdirectory within the project root (e.g., `ISOT-FakeNews-HashedWords/data/ISOT_Fake.csv`).
 
-*   **High-Accuracy Model:** Achieved 99.89% accuracy using a RandomForest classifier, outperforming many existing approaches.
-*   **Advanced Text Preprocessing:**
-    *   NLTK and SpaCy for tokenization, stop-word removal, and lemmatization.
-    *   Named Entity Recognition (NER) preservation to retain important contextual information.
-    *   Specialized `TweetTokenizer` for handling social media text nuances.
-*   **Privacy-Enhancing Hashing:**
-    *   Implemented SHA-256 hashing of individual words *before* embedding/vectorization. This provides a level of anonymization, making it harder to reverse-engineer original text from the features while still allowing the model to learn patterns.
-*   **Diverse Vectorization Techniques Explored:**
-    *   **OpenAI Embeddings (`text-embedding-ada-002`):** Leveraged powerful pre-trained language model embeddings, often yielding the best performance. Handled API rate limits and chunking for long texts.
-    *   **Doc2Vec:** Trained custom document embeddings to capture semantic meaning.
-    *   **HashingVectorizer:** A memory-efficient technique for converting text to numerical features.
-*   **Efficient Model & Training:**
-    *   Utilized RandomForest, known for its robustness and efficiency.
-    *   Optimized hyperparameters using `RandomizedSearchCV`.
-    *   Pickled trained models and pre-computed embeddings for faster iteration and deployment.
-*   **Comprehensive Evaluation:**
-    *   Metrics: Accuracy, Precision, Recall, F1-Score.
-    *   Confusion matrices for detailed performance analysis.
-    *   Analysis of prediction probabilities and average difference from actual labels.
-*   **Cross-Dataset Evaluation:** Tested models on multiple datasets (ISOT, Lifferth) to assess generalizability.
+## Key Methodologies & Features
+
+*   **Privacy-Focused Word Hashing:** SHA-256 hashing is applied to each word after initial text cleaning but *before* the vectorization or embedding step. This serves as a data anonymization layer.
+*   **Comprehensive Preprocessing:**
+    *   Standard text cleaning (lowercase, punctuation/special character removal).
+    *   Stop-word removal (NLTK).
+    *   Tokenization (NLTK `word_tokenize` and `TweetTokenizer` for OpenAI approach).
+    *   Named Entity Recognition (NER) preservation using SpaCy (for OpenAI and Doc2Vec word-hashed approaches).
+*   **Vectorization/Embedding Techniques on Hashed Words:**
+    *   **Doc2Vec (Gensim):** Training document vectors from sequences of hashed words.
+    *   **OpenAI Embeddings:** Generating embeddings for sequences of hashed words using models like `text-embedding-ada-002`. Includes logic for handling long texts by chunking.
+    *   **HashingVectorizer (Scikit-learn):** Applying Scikit-learn's HashingVectorizer directly to space-separated strings of hashed words.
+*   **Classification Model:** RandomForestClassifier from Scikit-learn.
+*   **Evaluation:** Standard metrics including Accuracy, Precision, Recall, and F1-Score. Confusion matrices can be generated.
+*   **Modular Scripts:** Separate scripts for:
+    *   Full training and evaluation pipelines for each vectorization method.
+    *   Testing/evaluating pre-trained models by loading saved models and dataframes/features.
 
 ## Project Structure
 
-*   `/data/`: Contains datasets used for training and testing (or instructions to acquire them).
-*   `/src/`: Source code for the project.
-    *   `train_evaluate_best_model.py`: Script to train and evaluate the top-performing model (OpenAI embeddings with hashed words).
-    *   `predict_new_article.py`: Example script to classify a new piece of text.
-    *   `/experiments/`: Contains scripts for other vectorization methods and dataset combinations (Doc2Vec, HashingVectorizer).
-    *   `/tuning/`: Scripts used for hyperparameter optimization.
-*   `/saved_models_embeddings/`: Stores pre-trained model (.pkl) and pre-computed embedding files.
-*   `/results/`: (Optional) Output files like confusion matrices, performance tables.
+*   `/data/`: (Instructions to download ISOT dataset).
+*   `/saved_models_dataframes/`: Stores pre-trained RandomForest models (.pkl), pre-computed DataFrames with embeddings (.pkl), Gensim Doc2Vec models (.gensim), HashingVectorizer objects (.pkl), and transformed feature matrices (.pkl). *(Note: Larger files may be tracked with Git LFS).*
+*   `/src/`: Source code.
+    *   `train_evaluate_doc2vec_wordhash.py`: Full pipeline for Doc2Vec + Word Hashing.
+    *   `train_evaluate_openai_wordhash.py`: Full pipeline for OpenAI + Word Hashing.
+    *   `train_evaluate_hashvec_wordhash.py`: Full pipeline for HashingVectorizer + Word Hashing (this is likely the 99.89% model).
+    *   `test_pretrained_doc2vec_wordhash.py`: Loads and tests saved Doc2Vec system.
+    *   `test_pretrained_openai_wordhash.py`: Loads and tests saved OpenAI system.
+    *   `test_pretrained_hashvec_wordhash.py`: Loads and tests saved HashingVectorizer system.
+*   `/results/`: (Optional) Placeholder for output images like confusion matrices or performance tables.
+*   `requirements.txt`: Python dependencies.
 *   `README.md`: This file.
 
-## How to Run (Example for the best model)
+## How to Run
 
 1.  **Setup:**
     *   Clone the repository.
-    *   Install dependencies: `pip install pandas nltk gensim scikit-learn spacy openai seaborn matplotlib tiktoken`
-    *   Download NLTK resources: `python -m nltk.downloader stopwords punkt`
+    *   Create and activate a Python virtual environment.
+    *   Install dependencies: `pip install -r requirements.txt`
+    *   Download NLTK resources: In Python, run `import nltk; nltk.download('stopwords'); nltk.download('punkt')`
     *   Download SpaCy model: `python -m spacy download en_core_web_sm`
-    *   Place datasets in the `/data/` directory.
-    *   (If using OpenAI embeddings) Set your OpenAI API key, e.g., as an environment variable or directly in the script (for local testing only, not recommended for public repos).
-2.  **Training & Evaluation:**
-    *   Navigate to the `src/` directory.
-    *   Run the main training script: `python train_evaluate_best_model.py`
-    *   This will preprocess data, generate/load embeddings, train the RandomForest model, and print evaluation metrics.
-3.  **Prediction on New Text:**
-    *   Run the prediction script: `python predict_new_article.py` (You might need to modify it to take text input).
+    *   Download the ISOT dataset and place `Fake.csv` and `True.csv` in a `data/` subdirectory.
+    *   (If running OpenAI scripts) Set your OpenAI API key as an environment variable `OPENAI_API_KEY` or in the scripts (for local testing only).
 
-*(Adjust the "How to Run" section based on how you structure your final main script and if embeddings/models need to be generated first or are loaded from `/saved_models_embeddings/`)*
+2.  **Option A: Run a Full Training & Evaluation Pipeline:**
+    *   Example (for the HashingVectorizer model, likely your best):
+        `python src/train_evaluate_hashvec_wordhash.py`
+    *   This will preprocess, hash, vectorize, train, evaluate, and save the model & vectorizer to `/saved_models_dataframes/`.
+    *   Similarly, run other `train_evaluate_*.py` scripts to reproduce results for Doc2Vec or OpenAI.
 
-## Key Findings & Learnings
+3.  **Option B: Test a Pre-trained System (Assumes models/dataframes are in `/saved_models_dataframes/`):**
+    *   Example:
+        `python src/test_pretrained_hashvec_wordhash.py`
+    *   This loads the relevant `.pkl` files and runs evaluation on the test split defined within the loaded data.
 
-*   **Hashing Impact:** Applying SHA-256 hashing to individual words before embedding provided a good balance between data anonymization and model performance. While there might be a slight performance trade-off compared to non-hashed embeddings, the high accuracy achieved indicates its viability.
-*   **OpenAI Embeddings Superiority:** Models using OpenAI's `text-embedding-ada-002` generally outperformed Doc2Vec and HashingVectorizer for this task, likely due to the richness of the pre-trained representations.
-*   **Preprocessing Importance:** A careful preprocessing pipeline, including NER preservation and appropriate tokenization, is crucial for effective feature extraction.
-*   **Hyperparameter Tuning:** Significantly impacts RandomForest performance. `RandomizedSearchCV` was effective in finding optimal settings.
-*   **Computational Considerations:** HashingVectorizer is the most memory-efficient, while OpenAI embeddings require API calls and can be slower to generate initially. Doc2Vec training time depends on the dataset size.
+*(Note: The hyperparameter tuning scripts (`...params.py`) were not in the list of 6 files you provided for this round. If you want to include them, they would typically load a pre-computed DataFrame with embeddings/features from `/saved_models_dataframes/` and then run `RandomizedSearchCV`.)*
 
-This project demonstrates a practical and effective approach to building high-accuracy, privacy-aware fake news detection systems, a critical need in today's information ecosystem.
+## Key Findings (Example - update with your actual findings)
+
+*   The **HashingVectorizer** approach applied to SHA-256 hashed words on the ISOT dataset achieved the highest accuracy of **99.89%**.
+*   OpenAI embeddings on hashed words also demonstrated strong performance, showcasing the utility of powerful pre-trained models even on pseudonymized data.
+*   Doc2Vec on hashed words provided a competitive baseline.
+*   The word-hashing technique appears viable for adding a layer of data privacy without catastrophically degrading model performance for fake news detection on this dataset.
+
+This project demonstrates a systematic comparison of different privacy-enhancing vectorization techniques for fake news detection.
