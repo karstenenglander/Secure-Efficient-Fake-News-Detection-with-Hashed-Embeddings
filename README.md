@@ -39,7 +39,6 @@ This project utilizes the **ISOT Fake News Dataset**.
 ## Project Structure
 
 *   `/data/`: (Instructions to download ISOT dataset).
-*   `/saved_models_dataframes/`: Stores pre-trained RandomForest models (.pkl), pre-computed DataFrames with embeddings (.pkl), Gensim Doc2Vec models (.gensim), HashingVectorizer objects (.pkl), and transformed feature matrices (.pkl). *(Note: Larger files may be tracked with Git LFS).*
 *   `/src/`: Source code.
     *   `train_evaluate_doc2vec_wordhash.py`: Full pipeline for Doc2Vec + Word Hashing.
     *   `train_evaluate_openai_wordhash.py`: Full pipeline for OpenAI + Word Hashing.
@@ -65,20 +64,13 @@ This project utilizes the **ISOT Fake News Dataset**.
 2.  **Option A: Run a Full Training & Evaluation Pipeline:**
     *   Example (for the HashingVectorizer model, likely your best):
         `python src/train_evaluate_hashvec_wordhash.py`
-    *   This will preprocess, hash, vectorize, train, evaluate, and save the model & vectorizer to `/saved_models_dataframes/`.
+    *   This will preprocess, hash, vectorize, train, evaluate, and save the model & vectorizer to a .pkl file.
     *   Similarly, run other `train_evaluate_*.py` scripts to reproduce results for Doc2Vec or OpenAI.
 
-3.  **Option B: Test a Pre-trained System (Assumes models/dataframes are in `/saved_models_dataframes/`):**
-    *   Example:
-        `python src/test_pretrained_hashvec_wordhash.py`
-    *   This loads the relevant `.pkl` files and runs evaluation on the test split defined within the loaded data.
-
-*(Note: The hyperparameter tuning scripts (`...params.py`) were not in the list of 6 files you provided for this round. If you want to include them, they would typically load a pre-computed DataFrame with embeddings/features from `/saved_models_dataframes/` and then run `RandomizedSearchCV`.)*
-
-## Key Findings (Example - update with your actual findings)
+## Key Findings
 
 *   The **HashingVectorizer** approach applied to SHA-256 hashed words on the ISOT dataset achieved the highest accuracy of **99.89%**.
-*   OpenAI embeddings on hashed words also demonstrated strong performance, showcasing the utility of powerful pre-trained models even on pseudonymized data.
+*   OpenAI embeddings on hashed words also demonstrated strong performance, showcasing the utility of powerful pre-trained models even on pseudonymized data. However, it also took the most time to train in additon to incurring the most cost.
 *   Doc2Vec on hashed words provided a competitive baseline.
 *   The word-hashing technique appears viable for adding a layer of data privacy without catastrophically degrading model performance for fake news detection on this dataset.
 
