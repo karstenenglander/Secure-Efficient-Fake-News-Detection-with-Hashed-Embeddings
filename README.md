@@ -46,7 +46,7 @@ This project utilizes the **ISOT Fake News Dataset**.
     *   `test_pretrained_doc2vec_wordhash.py`: Loads and tests saved Doc2Vec system.
     *   `test_pretrained_openai_wordhash.py`: Loads and tests saved OpenAI system.
     *   `test_pretrained_hashvec_wordhash.py`: Loads and tests saved HashingVectorizer system.
-*   `/results/`: (Optional) Placeholder for output images like confusion matrices or performance tables.
+*   `/results/`: Ooutput images like confusion matrices or performance tables.
 *   `requirements.txt`: Python dependencies.
 *   `README.md`: This file.
 
